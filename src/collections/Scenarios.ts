@@ -1,8 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '@/access/authenticated'
-import { anyone } from '@/access/anyone'
-import { Label } from '@radix-ui/react-select'
 
 export const Scenarios: CollectionConfig = {
     slug: 'scenarios',
@@ -127,12 +125,10 @@ export const Scenarios: CollectionConfig = {
                         {label: 'None', value: 'none'},
                     ],
                     admin: {
-                        condition: (data) => data.isUserMessage,
+                        condition: (data) => data.isUserMessage, //Only show status for user's messages
                     },
                 },
             ],
         },
     ],
-        
-    
 };

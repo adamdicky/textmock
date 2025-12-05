@@ -72,6 +72,8 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    scenarios: Scenario;
+    transactions: Transaction;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -94,6 +96,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    scenarios: ScenariosSelect<false> | ScenariosSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -784,6 +788,55 @@ export interface Form {
   createdAt: string;
 }
 /**
+ * Saved iMessage mockup scenarios created by users.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "scenarios".
+ */
+export interface Scenario {
+  id: number;
+  title: string;
+  author: number | User;
+  uiSettings: {
+    recipientName: string;
+    deviceFrame?: ('iPhone15Pro' | 'none') | null;
+    chatType?: ('iMessage' | 'SMS') | null;
+    darkTheme?: boolean | null;
+  };
+  messages?:
+    | {
+        text: string;
+        isUserMessage?: boolean | null;
+        timestamp?: string | null;
+        status?: ('sent' | 'delivered' | 'read' | 'none') | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Logs all token purchases and consumption events
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: number;
+  author: number | User;
+  type: 'purchase' | 'consumption' | 'bonus';
+  /**
+   * Positive for addition, negative for subtraction.
+   */
+  amount: number;
+  /**
+   * ID of the saved scenario (for consumption)
+   */
+  referenceID?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -992,6 +1045,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'scenarios';
+        value: number | Scenario;
+      } | null)
+    | ({
+        relationTo: 'transactions';
+        value: number | Transaction;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1358,6 +1419,45 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "scenarios_select".
+ */
+export interface ScenariosSelect<T extends boolean = true> {
+  title?: T;
+  author?: T;
+  uiSettings?:
+    | T
+    | {
+        recipientName?: T;
+        deviceFrame?: T;
+        chatType?: T;
+        darkTheme?: T;
+      };
+  messages?:
+    | T
+    | {
+        text?: T;
+        isUserMessage?: T;
+        timestamp?: T;
+        status?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  author?: T;
+  type?: T;
+  amount?: T;
+  referenceID?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
