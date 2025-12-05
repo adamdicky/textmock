@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-
+import { auth } from "node_modules/payload/dist/auth/operations/auth";
 import { authenticated } from '@/access/authenticated'
 
 export const Transactions: CollectionConfig = {
