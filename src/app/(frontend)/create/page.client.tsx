@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
+import { CellSignalFullIcon, CellSignalHighIcon, WifiHighIcon } from '@phosphor-icons/react'
 import {
   Select,
   SelectContent,
@@ -17,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card } from '@/components/ui/card'
-import { Trash2, Plus, Save, Battery, Wifi, Signal } from 'lucide-react'
+import { Trash2, Plus, Save, Battery, Wifi, Signal, ChevronRight } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 
 interface Props {
@@ -300,46 +301,68 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
 
     return (
         <div className="relative">
-             {/* Device Frame (Optional) */}
+             {/* Device Frame */}
              <div className={cn(
                  "relative w-[320px] h-[650px] sm:w-[375px] sm:h-[812px] bg-black rounded-[50px] shadow-2xl border-[8px] border-zinc-800 overflow-hidden",
-                 "ring-1 ring-white/10" // subtle highlight
+                 "ring-1 ring-white/10" 
              )}>
-                 {/* Dynamic Island / Notch area */}
-                 <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[35px] w-[120px] bg-black z-20 rounded-b-3xl"></div>
+                 
+                 {/* --- FIXED: Dynamic Island --- */}
+                 {/* Positioned absolutely, centered horizontally */}
+                 <div className="absolute top-[11px] left-1/2 -translate-x-1/2 h-[30px] w-[120px] bg-black z-30 rounded-[20px]"></div>
+
+                 {/* --- FIXED: iOS Status Bar --- */}
+                 <div className={cn(
+                    "absolute top-0 w-full h-[54px] px-8 flex justify-between items-center text-[14px] font-semibold z-40 select-none",
+                    isDark ? "text-white" : "text-black"
+                 )}>
+                    {/* Time (Left) */}
+                    <span>9:41</span>
+
+                    {/* Icons (Right) */}
+                    <div className="flex gap-2 items-center">
+                        {/* Use generic shapes if you don't have the specific Phosphor/Lucide icons loaded */}
+                        <CellSignalHighIcon className="w-5 h-5" /> 
+                        <WifiHighIcon className="w-4 h-4" />
+                        <Battery className="w-5 h-5" />
+                    </div>
+                 </div>
 
                  {/* Screen Content */}
-                 <div className={screenBase}>
-                     
-                     {/* iOS Status Bar (Mock) */}
-                     <div className="h-12 px-6 flex justify-between items-end pb-2 text-[12px] font-semibold z-10">
-                        <span>9:41</span>
-                        <div className="flex gap-1.5 items-center">
-                            <Signal className="w-3.5 h-3.5" />
-                            <Wifi className="w-3.5 h-3.5" />
-                            <Battery className="w-4 h-4" />
-                        </div>
-                     </div>
+                 {/* Added pt-[54px] so content starts BELOW the status bar area */}
+                 <div className={cn(screenBase, "pt-[54px]")}>
 
                      {/* Navigation Bar */}
                      <div className={cn(
-                         "h-12 flex flex-col items-center justify-center z-10 backdrop-blur-md bg-opacity-80 border-b",
-                         isDark ? "bg-zinc-900/50 border-zinc-800" : "bg-zinc-100/50 border-zinc-200"
+                         "flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0",
+                         isDark ? "border-zinc-800" : "border-zinc-200/50"
                      )}>
-                         <div className="flex flex-col items-center">
-                            <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-sm font-medium text-white mb-0.5">
+                         <div className="flex flex-col items-center gap-1.5">
+                            {/* Larger Avatar */}
+                            <div className={cn(
+                                "w-12 h-12 rounded-full flex items-center justify-center text-xl font-medium text-white shadow-sm",
+                                // Gradient style
+                                "bg-gradient-to-b from-gray-400 to-gray-500" 
+                            )}>
                                 {settings.recipientName.charAt(0).toUpperCase()}
                             </div>
-                            <span className="text-[10px] opacity-70">
-                                {settings.recipientName} &gt;
-                            </span>
+                            
+                            {/* Name + Chevron */}
+                            <div className="flex items-center gap-1 cursor-pointer opacity-90 hover:opacity-100 transition-opacity">
+                                <span className="text-[12px] font-semibold tracking-tight">
+                                    {settings.recipientName}
+                                </span>
+                                <ChevronRight className={cn(
+                                    "w-3 h-3 opacity-50",
+                                    isDark ? "text-gray-400" : "text-gray-500"
+                                )} />
+                            </div>
                          </div>
                      </div>
 
                      {/* Chat Area */}
                      <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">
-                         {/* Default 'iMessage' label at top */}
-                         <div className="text-center py-4">
+                         <div className="text-center py-0">
                              <span className="text-[10px] text-gray-500 font-medium">
                                  {isSMS ? 'Text Message' : 'iMessage'}
                              </span>
@@ -353,9 +376,8 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                                  "flex flex-col max-w-[75%]",
                                  msg.isUserMessage ? "ml-auto items-end" : "mr-auto items-start"
                              )}>
-                                 {/* Message Bubble */}
                                  <div className={cn(
-                                     "px-4 py-2 rounded-2xl text-[15px] leading-snug",
+                                     "px-4 py-2 rounded-2xl text-[15px] leading-snug break-words",
                                      msg.isUserMessage 
                                         ? `${userBubbleColor} rounded-br-sm` 
                                         : (isDark ? "bg-zinc-800 text-white rounded-bl-sm" : "bg-gray-200 text-black rounded-bl-sm")
@@ -363,7 +385,6 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                                      {msg.text || "..."}
                                  </div>
 
-                                 {/* Timestamp / Status (Only show if set) */}
                                  {msg.timestamp && (
                                      <span className={cn(
                                          "text-[10px] mt-1 font-medium px-1",
@@ -377,30 +398,26 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                                  )}
                              </div>
                          ))}
-                         {/* Spacer for bottom input area */}
-                         <div className="h-4" />
                      </div>
 
-                     {/* Bottom Input Area (Mock) */}
+                     {/* Bottom Input Area */}
                      <div className={cn(
-                         "min-h-[50px] px-4 py-2 flex items-center gap-3 z-10",
+                         "min-h-[50px] px-4 py-2 flex items-center gap-3 z-10 pb-6", // Added extra bottom padding for Home Bar safety
                          isDark ? "bg-black" : "bg-white"
                      )}>
-                         <div className={cn("w-8 h-8 rounded-full flex-shrink-0 items-center flex justify-center", isDark ? "bg-zinc-800" : "bg-gray-200")}>
-                                <Plus />
+                         <div className={cn("w-8 h-8 rounded-full flex-shrink-0 items-center flex justify-center text-gray-400 shadow-md", isDark ? "bg-zinc-800" : "bg-gray-200")}>
+                                <Plus className="w-5 h-5" />
                          </div>
                          <div className={cn(
-                             "flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground",
+                             "flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground shadow-md shadow-black/5",
                              isDark ? "border-zinc-800 bg-zinc-900" : "border-zinc-200 bg-white"
                          )}>
                              iMessage
                          </div>
                      </div>
                      
-                     {/* Home Bar */}
-                     <div className="h-[20px] flex justify-center items-center">
-                         <div className="w-[120px] h-[5px] bg-gray-500/50 rounded-full"></div>
-                     </div>
+                     {/* Home Bar (Overlay) */}
+                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[5px] bg-white/50 rounded-full z-50 pointer-events-none"></div>
                  </div>
              </div>
         </div>
