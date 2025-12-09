@@ -33,21 +33,28 @@ export interface InitialData {
  * Returns null if not logged in.
  */
 export async function getInitialUserData(): Promise<InitialData | null> {
-  const payload = await getPayload({ config: configPromise })
-  const requestHeaders = await headers()
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const requestHeaders = await headers()
 
-  // 1. Authenticate using the HTTP-only payload-token cookie
-  const { user } = await payload.auth({ headers: requestHeaders })
+    // 1. Authenticate using the HTTP-only payload-token cookie
+    const { user } = await payload.auth({ headers: requestHeaders })
 
-  if (!user) {
-    return null
+    if (!user) {
+      console.log('Server action: No user logged in.')
+      return null
+    }
+
+    return { 
+      userId: user.id as string, 
+      tokenBalance: (user.tokens as number) || 0
+    }
+  } catch (error) {
+    console.error('CRIT ERROR in getInitialUserData: ', error);
+    return null;
   }
 
-  return { 
-    userId: user.id as string, 
-
-    tokenBalance: (user.tokens as number) || 0 
-  }
+  
 }
 
 /**
