@@ -151,6 +151,7 @@ export async function handleSaveScenarioAction(
           author: user.id, // Securely link to the logged-in user
           uiSettings: uiSettings,
           messages: sanitizedMessages,
+          previewImage: previewImageId || undefined,
         },
       })
     }

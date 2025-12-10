@@ -371,7 +371,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
     );
 
     return (
-        <div className="relative">
+        <div className="relative" style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}}>
              {/* Device Frame */}
              <div className={cn(
                  "relative w-[320px] h-[650px] sm:w-[375px] sm:h-[812px] bg-black rounded-[50px] shadow-2xl border-[8px] border-zinc-800 overflow-hidden",
@@ -409,7 +409,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                          "flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0",
                          isDark ? "border-zinc-800" : "border-zinc-200/50"
                      )}>
-                         <div className="flex flex-col items-center gap-1.5">
+                         <div className="flex flex-col items-center gap-1.5" style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}}>
                             {/* Larger Avatar */}
                             <div className={cn(
                                 "w-12 h-12 rounded-full flex items-center justify-center text-xl font-medium text-white shadow-sm",
@@ -420,7 +420,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                             </div>
                             
                             {/* Name + Chevron */}
-                            <div className={cn(
+                            <div style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
                               "flex items-center px-2 py-1 gap-1 cursor-pointer opacity-90 hover:opacity-100 transition-opacity rounded-2xl",
                               isDark? "shadow-md shadow-slate-100/10" : "shadow-md shadow-slate-100"
                             )}>
@@ -437,7 +437,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
 
                      {/* Chat Area */}
                      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 no-scrollbar">
-                         <div className="text-center leading-none">
+                         <div className="text-center leading-none" style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}}>
                              <span className="text-[10px] text-gray-500 font-medium">
                                  {isSMS ? 'Text Message' : 'iMessage'}
                              </span>
@@ -451,7 +451,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                                  "flex flex-col max-w-[75%] pt-3",
                                  msg.isUserMessage ? "ml-auto items-end" : "mr-auto items-start"
                              )}>
-                                 <div className={cn(
+                                 <div style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
                                      "px-4 py-2 rounded-2xl text-[15px] leading-snug break-words",
                                      msg.isUserMessage 
                                         ? `${userBubbleColor} rounded-br-sm` 
@@ -461,7 +461,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                                  </div>                                 
 
                                  {msg.timestamp && (
-                                     <span className={cn(
+                                     <span style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
                                          "text-[10px] mt-1 font-medium px-1",
                                          msg.isUserMessage ? "text-right" : "text-left",
                                          isDark ? "text-gray-500" : "text-gray-400"
@@ -486,9 +486,9 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                                 <Plus className="w-5 h-5" />
                          </div>
                          
-                         <div className={cn(
+                         <div style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
                              "flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground shadow-md shadow-slate-100",
-                             isDark ? "border-zinc-800 bg-zinc-900 shadow-md shadow-slate-100/10" : "border-zinc-200 bg-white"
+                             isDark ? "border-zinc-800 bg-zinc-900 shadow-md shadow-slate-100/10" : "border-zinc-200 bg-white",
                          )}>
                              iMessage
                          </div>
