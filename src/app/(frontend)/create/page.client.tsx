@@ -23,10 +23,11 @@ import { cn } from '@/utilities/ui'
 
 interface Props {
   initialUserId: string
+  initialUserName: string
   initialBalance: number
 }
 
-const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialBalance }) => {
+const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,initialBalance }) => {
   const router = useRouter()
   const [tokenBalance, setTokenBalance] = useState(initialBalance)
   const [isSaving, setIsSaving] = useState(false)
@@ -116,8 +117,8 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialBalance }
         {/* Header / Stats */}
         <div className="flex justify-between items-center p-4 bg-muted rounded-lg border">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">User ID</p>
-            <code className="text-xs">{initialUserId}</code>
+            <p className="text-sm font-medium text-muted-foreground">User:</p>
+            <code className="text-xs">{initialUserName}</code>
           </div>
           <div className="text-right">
             <p className="text-sm font-medium text-muted-foreground">Balance</p>

@@ -16,7 +16,9 @@ export default async function CreateScenarioPage() {
       <h1 className="text-3xl font-bold mb-8">Create New Scenario</h1>
       <CreateScenarioClient 
         initialUserId={userData.userId} 
+        initialUserName={userData.userName}
         initialBalance={userData.tokenBalance} 
+      
       />
     </div>
   )

@@ -23,6 +23,7 @@ export interface UISettings {
 
 export interface InitialData {
   userId: string
+  userName: string
   tokenBalance: number
 }
 
@@ -47,6 +48,7 @@ export async function getInitialUserData(): Promise<InitialData | null> {
 
     return { 
       userId: user.id as string, 
+      userName: user.name as string || 'User',
       tokenBalance: (user.tokens as number) || 0
     }
   } catch (error) {
