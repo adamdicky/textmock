@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
+import { error } from 'console'
 
 // --- TYPES ---
 export interface Message {
@@ -55,8 +56,37 @@ export async function getInitialUserData(): Promise<InitialData | null> {
     console.error('CRIT ERROR in getInitialUserData: ', error);
     return null;
   }
+}
 
-  
+export  async function getUserScenarios() {
+  try {
+    const payload = await getPayload({config: configPromise})
+    const requestHeaders = await headers()
+    const { user } = await payload.auth({headers: requestHeaders})
+
+    if (!user) {
+      console.log('Server aciton: No user logged in.')
+      return []
+    }
+
+    const scenarios = await payload.find({
+      collection: 'scenarios',
+      where: {
+        author: {
+          equals: user.id,
+        },
+      },
+      depth: 1,
+      sort: '-createdAt',
+    })
+
+    return JSON.parse(JSON.stringify(scenarios.docs))
+
+  } catch (error) {
+    console.error('CRIT ERROR in getUserScenarios: ', error);
+    return [];
+  }
+
 }
 
 /**
@@ -65,6 +95,8 @@ export async function getInitialUserData(): Promise<InitialData | null> {
 export async function handleSaveScenarioAction(
   uiSettings: UISettings,
   messages: Message[],
+  previewImageId?: string | null,
+  existingScenarioId?: string, //for editing purposes
 ): Promise<{ success: boolean; newBalance?: number; error?: string }> {
   const COST = 2
   const payload = await getPayload({ config: configPromise })
@@ -95,17 +127,33 @@ export async function handleSaveScenarioAction(
       status: msg.status,
     }))
 
-    // 4. Create Scenario using Payload Local API
-    // payload.create handles the SQL relationships automatically
-    const scenario = await payload.create({
-      collection: 'scenarios',
-      data: {
-        title: `${uiSettings.recipientName} Scenario`,
-        author: user.id, // Securely link to the logged-in user
-        uiSettings: uiSettings,
-        messages: sanitizedMessages,
-      },
-    })
+    let scenario;
+
+    // 4. Check if Scenario is Existing Scenario, then create new one using Payload Local API
+    if (existingScenarioId) {
+      scenario = await payload.update({
+        collection: 'scenarios',
+        id: existingScenarioId,
+        data: {
+          title: `${uiSettings.recipientName} (Updated)`,
+          uiSettings: uiSettings,
+          messages: sanitizedMessages,
+          previewImage: previewImageId || undefined,
+        },
+      })
+    } else {
+      // 5. If New, Create Scenario using Payload Local API
+      // payload.create handles the SQL relationships automatically
+      scenario = await payload.create({
+        collection: 'scenarios',
+        data: {
+          title: `${uiSettings.recipientName} Scenario`,
+          author: user.id, // Securely link to the logged-in user
+          uiSettings: uiSettings,
+          messages: sanitizedMessages,
+        },
+      })
+    }
 
     const newBalance = currentBalance - COST
 
@@ -127,6 +175,7 @@ export async function handleSaveScenarioAction(
       },
     })
 
+    revalidatePath('/dashboard')
     revalidatePath('/create')
     return { success: true, newBalance }
 

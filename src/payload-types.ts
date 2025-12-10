@@ -812,6 +812,10 @@ export interface Scenario {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Auto generated screenshot of scenario.
+   */
+  previewImage?: (string | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -1444,6 +1448,7 @@ export interface ScenariosSelect<T extends boolean = true> {
         status?: T;
         id?: T;
       };
+  previewImage?: T;
   updatedAt?: T;
   createdAt?: T;
 }

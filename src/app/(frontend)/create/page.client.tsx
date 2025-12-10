@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { handleSaveScenarioAction, type Message, type UISettings } from '@/actions/index'
-
+import { toBlob } from 'html-to-image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -31,6 +31,8 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
   const router = useRouter()
   const [tokenBalance, setTokenBalance] = useState(initialBalance)
   const [isSaving, setIsSaving] = useState(false)
+
+  const phonePreviewRef = useRef<HTMLDivElement>(null)
 
   // -- State --
   const [uiSettings, setUiSettings] = useState<UISettings>({
@@ -83,6 +85,60 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
     )
   }
 
+  const uploadScreenshot = async (): Promise<string | null> => {
+    if (!phonePreviewRef.current) {
+        console.error("❌ Error: Phone preview ref is missing.");
+        return null;
+    }
+
+    try {
+      console.log("📸 Starting screenshot capture...");
+
+      // 1. Generate Blob with better settings
+      const blob = await toBlob(phonePreviewRef.current, { 
+          cacheBust: true,
+          skipAutoScale: true,
+          pixelRatio: 2, // Better quality
+          backgroundColor: uiSettings.darkTheme ? '#000000' : '#ffffff', // Prevent transparent background
+          fontEmbedCSS: '',
+      })
+
+      if (!blob) {
+          console.error("❌ Error: Generated blob is empty.");
+          return null;
+      }
+      
+      console.log(`✅ Capture success! Size: ${(blob.size / 1024).toFixed(2)} KB`);
+
+      // 2. Create FormData
+      const file = new File([blob], `scenario-${Date.now()}.png`, { type: 'image/png' })
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('alt', 'Scenario Screenshot') // Required by your Media collection?
+
+      // 3. Upload via REST API
+      console.log("📤 Uploading to /api/media...");
+      const res = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("❌ Upload API Error:", res.status, errorData);
+        throw new Error(errorData.errors?.[0]?.message || 'Upload failed');
+      }
+      
+      const data = await res.json()
+      console.log("🎉 Upload success! Image ID:", data.doc.id);
+      return data.doc.id 
+
+    } catch (e) {
+      console.error('🚨 Screenshot process failed:', e)
+      return null
+    }
+  }
+
   const handleSave = async () => {
     if (tokenBalance < 2) {
       alert('Insufficient tokens! Please top up.')
@@ -91,12 +147,21 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
 
     setIsSaving(true)
     try {
-      const result = await handleSaveScenarioAction(uiSettings, messages)
+      // 1. Capture & Upload Screenshot first
+      const mediaId = await uploadScreenshot()
+
+      // 2. Save Scenario with Media ID
+      const result = await handleSaveScenarioAction(
+        uiSettings, 
+        messages, 
+        mediaId // Pass ID to server action
+      )
 
       if (result.success && result.newBalance !== undefined) {
         setTokenBalance(result.newBalance)
         alert('Scenario saved successfully! 2 Tokens deducted.')
-        router.refresh() 
+        router.refresh()
+        router.push('/dashboard') // Redirect to dashboard after save
       } else {
         alert(`Failed: ${result.error}`)
       }
@@ -282,7 +347,10 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
 
       {/* --- RIGHT COLUMN: PREVIEW --- */}
       <div className="w-full lg:w-1/2 flex justify-center sticky top-10">
-         <PhonePreview settings={uiSettings} messages={messages} />
+         <div ref={phonePreviewRef}>
+          <PhonePreview settings={uiSettings} messages={messages} />
+         </div>
+       
       </div>
 
     </div>
@@ -338,7 +406,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
 
                      {/* Navigation Bar */}
                      <div className={cn(
-                         "flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0 bg-c",
+                         "flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0",
                          isDark ? "border-zinc-800" : "border-zinc-200/50"
                      )}>
                          <div className="flex flex-col items-center gap-1.5">

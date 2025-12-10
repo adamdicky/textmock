@@ -130,5 +130,16 @@ export const Scenarios: CollectionConfig = {
                 },
             ],
         },
+
+        {
+            name: 'previewImage',
+            type: 'upload',
+            relationTo: 'media',
+            required: false,
+            admin: {
+                description: 'Auto generated screenshot of scenario.',
+                readOnly: true,
+            }
+        },
     ],
 };
