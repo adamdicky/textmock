@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CellSignalFullIcon, CellSignalHighIcon, WifiHighIcon } from '@phosphor-icons/react'
+import { BatteryChargingIcon, CellSignalFullIcon, CellSignalHighIcon, WifiHighIcon } from '@phosphor-icons/react'
 import {
   Select,
   SelectContent,
@@ -317,24 +317,25 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                     isDark ? "text-white" : "text-black"
                  )}>
                     {/* Time (Left) */}
-                    <span>9:41</span>
+                    <span className='ml-5 items-center'>9:41</span>
 
                     {/* Icons (Right) */}
-                    <div className="flex gap-2 items-center">
+                    <div className="flex justify-between gap-1 items-center">
                         {/* Use generic shapes if you don't have the specific Phosphor/Lucide icons loaded */}
-                        <CellSignalHighIcon className="w-5 h-5" /> 
-                        <WifiHighIcon className="w-4 h-4" />
-                        <Battery className="w-5 h-5" />
+                        {/* <CellSignalHighIcon size={23} className="" />  */}
+                        <Signal size={23} className='w-5 h-4' />
+                        <Wifi size={23} className='w-4 h-5'/>
+                        <BatteryChargingIcon size={23} weight="fill" className='w-5 h-5 ml-1' /> 
                     </div>
                  </div>
-
+                 
                  {/* Screen Content */}
                  {/* Added pt-[54px] so content starts BELOW the status bar area */}
                  <div className={cn(screenBase, "pt-[54px]")}>
 
                      {/* Navigation Bar */}
                      <div className={cn(
-                         "flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0",
+                         "flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0 bg-c",
                          isDark ? "border-zinc-800" : "border-zinc-200/50"
                      )}>
                          <div className="flex flex-col items-center gap-1.5">
@@ -348,8 +349,11 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                             </div>
                             
                             {/* Name + Chevron */}
-                            <div className="flex items-center gap-1 cursor-pointer opacity-90 hover:opacity-100 transition-opacity">
-                                <span className="text-[12px] font-semibold tracking-tight">
+                            <div className={cn(
+                              "flex items-center px-2 py-1 gap-1 cursor-pointer opacity-90 hover:opacity-100 transition-opacity rounded-2xl",
+                              isDark? "shadow-md shadow-slate-100/10" : "shadow-md shadow-slate-100"
+                            )}>
+                                <span className="text-[14px] font-semibold tracking-tight">
                                     {settings.recipientName}
                                 </span>
                                 <ChevronRight className={cn(
@@ -361,8 +365,8 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                      </div>
 
                      {/* Chat Area */}
-                     <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">
-                         <div className="text-center py-0">
+                     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 no-scrollbar">
+                         <div className="text-center leading-none">
                              <span className="text-[10px] text-gray-500 font-medium">
                                  {isSMS ? 'Text Message' : 'iMessage'}
                              </span>
@@ -373,7 +377,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
 
                          {messages.map((msg, i) => (
                              <div key={msg.id || i} className={cn(
-                                 "flex flex-col max-w-[75%]",
+                                 "flex flex-col max-w-[75%] pt-3",
                                  msg.isUserMessage ? "ml-auto items-end" : "mr-auto items-start"
                              )}>
                                  <div className={cn(
@@ -405,12 +409,14 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                          "min-h-[50px] px-4 py-2 flex items-center gap-3 z-10 pb-6", // Added extra bottom padding for Home Bar safety
                          isDark ? "bg-black" : "bg-white"
                      )}>
-                         <div className={cn("w-8 h-8 rounded-full flex-shrink-0 items-center flex justify-center text-gray-400 shadow-md", isDark ? "bg-zinc-800" : "bg-gray-200")}>
+                         <div className={cn(
+                          "w-8 h-8 rounded-full flex-shrink-0 items-center flex justify-center text-gray-400", 
+                          isDark ? "bg-zinc-800 shadow-md shadow-slate-100/10" : "bg-gray-200 shadow-md shadow-slate-100")}>
                                 <Plus className="w-5 h-5" />
                          </div>
                          <div className={cn(
-                             "flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground shadow-md shadow-black/5",
-                             isDark ? "border-zinc-800 bg-zinc-900" : "border-zinc-200 bg-white"
+                             "flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground shadow-md shadow-slate-100",
+                             isDark ? "border-zinc-800 bg-zinc-900 shadow-md shadow-slate-100/10" : "border-zinc-200 bg-white"
                          )}>
                              iMessage
                          </div>
