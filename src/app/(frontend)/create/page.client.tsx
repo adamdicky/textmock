@@ -387,7 +387,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                                         : (isDark ? "bg-zinc-800 text-white rounded-bl-sm" : "bg-gray-200 text-black rounded-bl-sm")
                                  )}>
                                      {msg.text || "..."}
-                                 </div>
+                                 </div>                                 
 
                                  {msg.timestamp && (
                                      <span className={cn(
@@ -414,6 +414,7 @@ const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: 
                           isDark ? "bg-zinc-800 shadow-md shadow-slate-100/10" : "bg-gray-200 shadow-md shadow-slate-100")}>
                                 <Plus className="w-5 h-5" />
                          </div>
+                         
                          <div className={cn(
                              "flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground shadow-md shadow-slate-100",
                              isDark ? "border-zinc-800 bg-zinc-900 shadow-md shadow-slate-100/10" : "border-zinc-200 bg-white"
