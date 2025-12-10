@@ -12,7 +12,7 @@ export default async function CreateScenarioPage() {
   }
 
   return (
-    <div className="container py-10 max-w-3xl">
+    <div className="container py-10 max-w-6xl">
       <h1 className="text-3xl font-bold mb-8">Create New Scenario</h1>
       <CreateScenarioClient 
         initialUserId={userData.userId} 

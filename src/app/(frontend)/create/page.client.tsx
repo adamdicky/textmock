@@ -112,7 +112,7 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
     <div className="flex flex-col lg:flex-row gap-8 items-start">
       
       {/* --- LEFT COLUMN: EDITOR --- */}
-      <div className="w-full lg:w-1/2 space-y-8">
+      <div className="w-full lg:w-1/2 space-y-3">
         
         {/* Header / Stats */}
         <div className="flex justify-between items-center p-4 bg-muted rounded-lg border">
@@ -192,14 +192,14 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
                 key={msg.id}
                 className="flex flex-col gap-3 p-4 border rounded-lg bg-card/50 relative group"
               >
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 mr-6 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6 text-destructive hover:bg-destructive/10"
                     onClick={() => removeMessage(msg.id)}
                     >
-                    <Trash2 className="w-3 h-3" />
+                    <Trash2 className="w-5 h-5" />
                     </Button>
                 </div>
 
@@ -241,7 +241,7 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
                     </div>
 
                     <div className="space-y-1">
-                        <Label className="text-xs">Status (My Msg Only)</Label>
+                        <Label className="text-xs">Status (My Message Only)</Label>
                         <Select
                         value={msg.status || 'none'}
                         onValueChange={(val) => updateMessage(msg.id, 'status', val)}
@@ -265,7 +265,7 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
         </Card>
 
         {/* Footer Actions */}
-        <div className="flex justify-end gap-4 pb-20">
+        <div className="flex justify-start gap-4 pb-20">
           <Button 
             size="lg" 
             onClick={handleSave} 
@@ -277,6 +277,8 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
           </Button>
         </div>
       </div>
+
+{/* dividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdivider */}
 
       {/* --- RIGHT COLUMN: PREVIEW --- */}
       <div className="w-full lg:w-1/2 flex justify-center sticky top-10">
