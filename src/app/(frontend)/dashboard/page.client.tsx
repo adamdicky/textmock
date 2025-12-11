@@ -95,9 +95,11 @@ const DashboardClient: React.FC<DashboardProps> = ({ user, scenarios }) => {
 
                         <div className="mt-auto flex gap-2">
                             {/* Edit Button (Consumes Tokens logic would be on the create page re-save) */}
-                            <Button variant="outline" className="flex-1" disabled>
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit (2 Token)
+                            <Button variant="outline" className="flex-1" asChild>
+                                <Link href={`/create?id=${item.id}`}>
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit (2 Token)
+                                </Link>
                             </Button>
 
                             {/* Download Button */}
