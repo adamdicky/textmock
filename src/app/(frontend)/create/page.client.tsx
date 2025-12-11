@@ -25,9 +25,10 @@ interface Props {
   initialUserId: string
   initialUserName: string
   initialBalance: number
+  existingScenario?: any
 }
 
-const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,initialBalance }) => {
+const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,initialBalance, existingScenario }) => {
   const router = useRouter()
   const [tokenBalance, setTokenBalance] = useState(initialBalance)
   const [isSaving, setIsSaving] = useState(false)
@@ -35,14 +36,19 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
   const phonePreviewRef = useRef<HTMLDivElement>(null)
 
   // -- State --
-  const [uiSettings, setUiSettings] = useState<UISettings>({
+  const [uiSettings, setUiSettings] = useState<UISettings>(
+    existingScenario?.uiSettings || {
     recipientName: 'John Doe',
     deviceFrame: 'iPhone15Pro',
     chatType: 'iMessage',
     darkTheme: false,
   })
 
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<Message[]>(
+    existingScenario?.messages?.map((m: any, i: number) => ({
+      ...m,
+      id: Date.now() + i, //generate temporary frontend id
+    })) || [
     {
       id: Date.now(),
       text: 'Hey! How are you?',
@@ -154,7 +160,8 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
       const result = await handleSaveScenarioAction(
         uiSettings, 
         messages, 
-        mediaId // Pass ID to server action
+        mediaId, // Pass ID to server action
+        existingScenario?.id //pass id to trigger UPDATE
       )
 
       if (result.success && result.newBalance !== undefined) {

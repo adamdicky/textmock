@@ -89,6 +89,31 @@ export  async function getUserScenarios() {
 
 }
 
+export async function getScenarioById(id: string) {
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const requestHeaders = await headers()
+    const { user } = await payload.auth({ headers: requestHeaders })
+
+    if (!user) return null
+
+    const scenario = await payload.findByID({
+      collection: 'scenarios',
+      id: id,
+      depth: 1,
+    })
+
+    // Security Check: Ensure the logged-in user owns this scenario
+    if (typeof scenario.author === 'object' ? scenario.author.id !== user.id : scenario.author !== user.id) {
+      return null
+    }
+
+    return JSON.parse(JSON.stringify(scenario))
+  } catch (error) {
+    return null
+  }
+}
+
 /**
  * Saves the scenario using the secure Server-Side Payload API
  */
@@ -135,7 +160,7 @@ export async function handleSaveScenarioAction(
         collection: 'scenarios',
         id: existingScenarioId,
         data: {
-          title: `${uiSettings.recipientName} (Updated)`,
+          title: `${uiSettings.recipientName} Scenario (Updated)`,
           uiSettings: uiSettings,
           messages: sanitizedMessages,
           previewImage: previewImageId || undefined,
