@@ -204,7 +204,35 @@ export interface Page {
       | null;
     media?: (string | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | FeaturesBlock
+    | {
+        title?: string | null;
+        plans?:
+          | {
+              name: string;
+              price: string;
+              tokens: number;
+              features?:
+                | {
+                    text?: string | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              isPopular?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'pricing';
+      }
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -789,6 +817,24 @@ export interface Form {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeaturesBlock".
+ */
+export interface FeaturesBlock {
+  title?: string | null;
+  items?:
+    | {
+        title: string;
+        description?: string | null;
+        icon?: ('smartphone' | 'shield' | 'zap' | 'globe') | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'features';
+}
+/**
  * Saved iMessage mockup scenarios created by users.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1157,6 +1203,29 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        features?: T | FeaturesBlockSelect<T>;
+        pricing?:
+          | T
+          | {
+              title?: T;
+              plans?:
+                | T
+                | {
+                    name?: T;
+                    price?: T;
+                    tokens?: T;
+                    features?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    isPopular?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
       };
   meta?:
     | T
@@ -1253,6 +1322,23 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeaturesBlock_select".
+ */
+export interface FeaturesBlockSelect<T extends boolean = true> {
+  title?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

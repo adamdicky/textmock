@@ -63,10 +63,8 @@ export async function registerUser(email: string, password: string, name: string
   }
 }
 
-/**
- * Gets the currently logged-in Payload User.
- * Returns null if not logged in.
- */
+
+//Gets the currently logged-in Payload User. Returns null if not logged in.
 export async function getInitialUserData(): Promise<InitialData | null> {
   try {
     const payload = await getPayload({ config: configPromise })
@@ -91,6 +89,7 @@ export async function getInitialUserData(): Promise<InitialData | null> {
   }
 }
 
+//Extract user's available scenarios.
 export  async function getUserScenarios() {
   try {
     const payload = await getPayload({config: configPromise})
@@ -121,6 +120,7 @@ export  async function getUserScenarios() {
   }
 
 }
+
 
 export async function getScenarioById(id: string) {
   try {
