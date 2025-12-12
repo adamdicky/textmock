@@ -1,23 +1,35 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Access } from 'payload'
 
 import { authenticated } from '@/access/authenticated'
 
+const isAdminOrSelf = ({ req: {user}, id }: { req: {user?: any}, id?: string | number }) => {
+    if (user?.role === 'admin') return true
+    if (user?.id === id) return true
+    return false
+}
+
+const isAdmin = ({ req: {user} }: { req: {user?: any} }) => {
+    return user?.role === 'admin'
+}
+
 export const Users: CollectionConfig = {
     slug: 'users',
-    access: {
-        admin: authenticated,
-        create: authenticated,
-        delete: authenticated,
-        read: authenticated,
-        update: authenticated,
-    },
 
     admin: {
-        defaultColumns: ['name', 'email', 'tokens'],
-        useAsTitle: 'name',
+        useAsTitle: 'email',
+        defaultColumns: ['name', 'email', 'role', 'tokens'],
+    },
+
+    access: {
+        admin: isAdmin,
+        create: () => true,
+        read: isAdminOrSelf,
+        update: isAdminOrSelf,
+        delete: isAdmin,
     },
 
     auth: true,
+
     fields: [
         {
             name: 'name',
@@ -25,15 +37,34 @@ export const Users: CollectionConfig = {
         },
 
         {
+            name: 'role',
+            type: 'select',
+            options: [
+                {label: 'Admin', value: 'admin'},
+                {label: 'User', value: 'user'},
+            ],
+            defaultValue: 'user',
+            required: true,
+            saveToJWT: true,
+            access: {
+                create: isAdmin,
+                update: isAdmin,
+            }
+        },
+
+        {
             name: 'tokens',
             type: 'number',
             label: 'Token Balance (1USD = 10 Tokens)',
-            defaultValue: 100, //Give new users 100 free tokens to start with
+            defaultValue: 0,
             min: 0,
             admin: {
-                readOnly: true,
-                description: 'Used to track available usage balance. 2 tokens consumed per saved scenario.'
+                description: 'User token balance.'
             },
+            access: {
+                update: isAdmin,
+                read: isAdminOrSelf,
+            }
         },
     ],
     timestamps: true,

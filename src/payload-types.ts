@@ -423,8 +423,9 @@ export interface Category {
 export interface User {
   id: string;
   name?: string | null;
+  role: 'admin' | 'user';
   /**
-   * Used to track available usage balance. 2 tokens consumed per saved scenario.
+   * User token balance.
    */
   tokens?: number | null;
   updatedAt: string;
@@ -1406,6 +1407,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   tokens?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -24,7 +24,7 @@ export default async function CreateScenarioPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="container py-10 max-w-3xl">
+    <div className="container py-10 max-w-5xl">
       <h1 className="text-3xl font-bold mb-8">
         {existingScenario ? 'Edit Scenario' : 'Create New Scenario'}
       </h1>

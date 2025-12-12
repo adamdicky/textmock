@@ -30,6 +30,39 @@ export interface InitialData {
 
 // --- ACTIONS ---
 
+//Register Users
+export async function registerUser(email: string, password: string, name: string) {
+  
+  const payload = await getPayload({ config: configPromise })
+
+  try {
+    //Check if email already exists
+    const existingUsers = await payload.find({
+      collection: 'users',
+      where: { email: {equals: email} },
+    })
+
+    if (existingUsers.totalDocs > 0) {
+      return { success: false, error: "Email is already registered."}
+    }
+
+    await payload.create({
+      collection: 'users',
+      data: {
+        email,
+        password,
+        name,
+        role: 'user',
+        tokens: 0, //Initial token
+      },
+    })
+
+    return { success: true }
+  } catch (e) {
+    return { success: false, error: 'Registration failed.'}
+  }
+}
+
 /**
  * Gets the currently logged-in Payload User.
  * Returns null if not logged in.
