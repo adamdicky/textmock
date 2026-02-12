@@ -9,7 +9,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { BatteryChargingIcon, CellSignalFullIcon, CellSignalHighIcon, WifiHighIcon } from '@phosphor-icons/react'
+import {
+  BatteryChargingIcon,
+  CellSignalFullIcon,
+  CellSignalHighIcon,
+  WifiHighIcon,
+} from '@phosphor-icons/react'
 import {
   Select,
   SelectContent,
@@ -28,7 +33,12 @@ interface Props {
   existingScenario?: any
 }
 
-const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,initialBalance, existingScenario }) => {
+const CreateScenarioClient: React.FC<Props> = ({
+  initialUserId,
+  initialUserName,
+  initialBalance,
+  existingScenario,
+}) => {
   const router = useRouter()
   const [tokenBalance, setTokenBalance] = useState(initialBalance)
   const [isSaving, setIsSaving] = useState(false)
@@ -38,32 +48,34 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
   // -- State --
   const [uiSettings, setUiSettings] = useState<UISettings>(
     existingScenario?.uiSettings || {
-    recipientName: 'John Doe',
-    deviceFrame: 'iPhone15Pro',
-    chatType: 'iMessage',
-    darkTheme: false,
-  })
+      recipientName: 'John Doe',
+      deviceFrame: 'iPhone15Pro',
+      chatType: 'iMessage',
+      darkTheme: false,
+    },
+  )
 
   const [messages, setMessages] = useState<Message[]>(
     existingScenario?.messages?.map((m: any, i: number) => ({
       ...m,
       id: Date.now() + i, //generate temporary frontend id
     })) || [
-    {
-      id: Date.now(),
-      text: 'Hey! How are you?',
-      isUserMessage: false,
-      timestamp: '10:30 AM',
-      status: 'none',
-    },
-    {
-      id: Date.now() + 1,
-      text: 'I\'m doing great, thanks for asking!',
-      isUserMessage: true,
-      timestamp: 'Delivered',
-      status: 'read',
-    },
-  ])
+      {
+        id: Date.now(),
+        text: 'Hey! How are you?',
+        isUserMessage: false,
+        timestamp: '10:30 AM',
+        status: 'none',
+      },
+      {
+        id: Date.now() + 1,
+        text: "I'm doing great, thanks for asking!",
+        isUserMessage: true,
+        timestamp: 'Delivered',
+        status: 'read',
+      },
+    ],
+  )
 
   // -- Handlers --
   const addMessage = () => {
@@ -86,35 +98,33 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
 
   const updateMessage = (id: number | undefined, field: keyof Message, value: any) => {
     if (!id) return
-    setMessages(
-      messages.map((m) => (m.id === id ? { ...m, [field]: value } : m))
-    )
+    setMessages(messages.map((m) => (m.id === id ? { ...m, [field]: value } : m)))
   }
 
   const uploadScreenshot = async (): Promise<string | null> => {
     if (!phonePreviewRef.current) {
-        console.error("❌ Error: Phone preview ref is missing.");
-        return null;
+      console.error('❌ Error: Phone preview ref is missing.')
+      return null
     }
 
     try {
-      console.log("📸 Starting screenshot capture...");
+      console.log('📸 Starting screenshot capture...')
 
       // 1. Generate Blob with better settings
-      const blob = await toBlob(phonePreviewRef.current, { 
-          cacheBust: true,
-          skipAutoScale: true,
-          pixelRatio: 2, // Better quality
-          backgroundColor: uiSettings.darkTheme ? '#000000' : '#ffffff', // Prevent transparent background
-          fontEmbedCSS: '',
+      const blob = await toBlob(phonePreviewRef.current, {
+        cacheBust: true,
+        skipAutoScale: true,
+        pixelRatio: 2, // Better quality
+        backgroundColor: null as any,
+        fontEmbedCSS: '',
       })
 
       if (!blob) {
-          console.error("❌ Error: Generated blob is empty.");
-          return null;
+        console.error('❌ Error: Generated blob is empty.')
+        return null
       }
-      
-      console.log(`✅ Capture success! Size: ${(blob.size / 1024).toFixed(2)} KB`);
+
+      console.log(`✅ Capture success! Size: ${(blob.size / 1024).toFixed(2)} KB`)
 
       // 2. Create FormData
       const file = new File([blob], `scenario-${Date.now()}.png`, { type: 'image/png' })
@@ -123,22 +133,21 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
       formData.append('alt', 'Scenario Screenshot') // Required by your Media collection?
 
       // 3. Upload via REST API
-      console.log("📤 Uploading to /api/media...");
+      console.log('📤 Uploading to /api/media...')
       const res = await fetch('/api/media', {
         method: 'POST',
         body: formData,
       })
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        console.error("❌ Upload API Error:", res.status, errorData);
-        throw new Error(errorData.errors?.[0]?.message || 'Upload failed');
+        const errorData = await res.json().catch(() => ({}))
+        console.error('❌ Upload API Error:', res.status, errorData)
+        throw new Error(errorData.errors?.[0]?.message || 'Upload failed')
       }
-      
-      const data = await res.json()
-      console.log("🎉 Upload success! Image ID:", data.doc.id);
-      return data.doc.id 
 
+      const data = await res.json()
+      console.log('🎉 Upload success! Image ID:', data.doc.id)
+      return data.doc.id
     } catch (e) {
       console.error('🚨 Screenshot process failed:', e)
       return null
@@ -158,10 +167,10 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
 
       // 2. Save Scenario with Media ID
       const result = await handleSaveScenarioAction(
-        uiSettings, 
-        messages, 
+        uiSettings,
+        messages,
         mediaId, // Pass ID to server action
-        existingScenario?.id //pass id to trigger UPDATE
+        existingScenario?.id, //pass id to trigger UPDATE
       )
 
       if (result.success && result.newBalance !== undefined) {
@@ -182,10 +191,8 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 items-start">
-      
       {/* --- LEFT COLUMN: EDITOR --- */}
       <div className="w-full lg:w-1/2 space-y-3">
-        
         {/* Header / Stats */}
         <div className="flex justify-between items-center p-4 bg-muted rounded-lg border">
           <div>
@@ -201,15 +208,13 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
         {/* Settings Section */}
         <Card className="p-6 space-y-6">
           <h2 className="text-xl font-semibold">1. Settings</h2>
-          
+
           <div className="grid grid-cols-1 gap-6">
             <div className="space-y-2">
               <Label>Recipient Name</Label>
               <Input
                 value={uiSettings.recipientName}
-                onChange={(e) =>
-                  setUiSettings({ ...uiSettings, recipientName: e.target.value })
-                }
+                onChange={(e) => setUiSettings({ ...uiSettings, recipientName: e.target.value })}
               />
             </div>
 
@@ -218,9 +223,7 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
                 <Label>Chat Type</Label>
                 <Select
                   value={uiSettings.chatType || 'iMessage'}
-                  onValueChange={(val: any) =>
-                    setUiSettings({ ...uiSettings, chatType: val })
-                  }
+                  onValueChange={(val: any) => setUiSettings({ ...uiSettings, chatType: val })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -232,17 +235,19 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
                 </Select>
               </div>
 
-               <div className="space-y-2">
+              <div className="space-y-2">
                 <Label>Theme</Label>
                 <div className="flex items-center space-x-2 h-10 border rounded-md px-3">
-                    <Checkbox
+                  <Checkbox
                     id="darkTheme"
                     checked={uiSettings.darkTheme || false}
                     onCheckedChange={(checked) =>
-                        setUiSettings({ ...uiSettings, darkTheme: checked as boolean })
+                      setUiSettings({ ...uiSettings, darkTheme: checked as boolean })
                     }
-                    />
-                    <Label htmlFor="darkTheme" className="cursor-pointer">Dark Mode</Label>
+                  />
+                  <Label htmlFor="darkTheme" className="cursor-pointer">
+                    Dark Mode
+                  </Label>
                 </div>
               </div>
             </div>
@@ -265,71 +270,70 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
                 className="flex flex-col gap-3 p-4 border rounded-lg bg-card/50 relative group"
               >
                 <div className="absolute top-2 right-2 mr-6 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
+                  <Button
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6 text-destructive hover:bg-destructive/10"
                     onClick={() => removeMessage(msg.id)}
-                    >
+                  >
                     <Trash2 className="w-5 h-5" />
-                    </Button>
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id={`isUser-${msg.id}`}
-                            checked={msg.isUserMessage || false}
-                            onCheckedChange={(checked) =>
-                            updateMessage(msg.id, 'isUserMessage', checked)
-                            }
-                        />
-                        <Label htmlFor={`isUser-${msg.id}`} className="text-xs font-medium text-muted-foreground">
-                            Sent by Me
-                        </Label>
-                    </div>
-                    <span className="text-xs text-muted-foreground font-mono">#{index + 1}</span>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`isUser-${msg.id}`}
+                      checked={msg.isUserMessage || false}
+                      onCheckedChange={(checked) => updateMessage(msg.id, 'isUserMessage', checked)}
+                    />
+                    <Label
+                      htmlFor={`isUser-${msg.id}`}
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Sent by Me
+                    </Label>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-mono">#{index + 1}</span>
                 </div>
 
                 <Textarea
-                    value={msg.text}
-                    onChange={(e) => updateMessage(msg.id, 'text', e.target.value)}
-                    rows={2}
-                    placeholder="Type a message..."
-                    className="resize-none"
+                  value={msg.text}
+                  onChange={(e) => updateMessage(msg.id, 'text', e.target.value)}
+                  rows={2}
+                  placeholder="Type a message..."
+                  className="resize-none"
                 />
-                
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                        <Label className="text-xs">Time / Label</Label>
-                        <Input
-                        className="h-8 text-xs"
-                        value={msg.timestamp || ''}
-                        onChange={(e) =>
-                            updateMessage(msg.id, 'timestamp', e.target.value)
-                        }
-                        placeholder="e.g. 10:30 AM"
-                        />
-                    </div>
 
-                    <div className="space-y-1">
-                        <Label className="text-xs">Status (My Message Only)</Label>
-                        <Select
-                        value={msg.status || 'none'}
-                        onValueChange={(val) => updateMessage(msg.id, 'status', val)}
-                        disabled={!msg.isUserMessage}
-                        >
-                        <SelectTrigger className="h-8 text-xs">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="sent">Sent</SelectItem>
-                            <SelectItem value="delivered">Delivered</SelectItem>
-                            <SelectItem value="read">Read</SelectItem>
-                            <SelectItem value="none">Hidden</SelectItem>
-                        </SelectContent>
-                        </Select>
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Time / Label</Label>
+                    <Input
+                      className="h-8 text-xs"
+                      value={msg.timestamp || ''}
+                      onChange={(e) => updateMessage(msg.id, 'timestamp', e.target.value)}
+                      placeholder="e.g. 10:30 AM"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-xs">Status (My Message Only)</Label>
+                    <Select
+                      value={msg.status || 'none'}
+                      onValueChange={(val) => updateMessage(msg.id, 'status', val)}
+                      disabled={!msg.isUserMessage}
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sent">Sent</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                        <SelectItem value="read">Read</SelectItem>
+                        <SelectItem value="none">Hidden</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             ))}
@@ -338,9 +342,9 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
 
         {/* Footer Actions */}
         <div className="flex justify-start gap-4 pb-20">
-          <Button 
-            size="lg" 
-            onClick={handleSave} 
+          <Button
+            size="lg"
+            onClick={handleSave}
             disabled={isSaving || tokenBalance < 2}
             className="w-full lg:w-auto"
           >
@@ -350,163 +354,220 @@ const CreateScenarioClient: React.FC<Props> = ({ initialUserId, initialUserName,
         </div>
       </div>
 
-{/* dividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdivider */}
+      {/* dividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdividerdivider */}
 
       {/* --- RIGHT COLUMN: PREVIEW --- */}
       <div className="w-full lg:w-1/2 flex justify-center sticky top-10">
-         <div ref={phonePreviewRef}>
+        <div ref={phonePreviewRef}>
           <PhonePreview settings={uiSettings} messages={messages} />
-         </div>
-       
+        </div>
       </div>
-
     </div>
   )
 }
 
 // --- SUB-COMPONENT: Phone Preview ---
 
-const PhonePreview = ({ settings, messages }: { settings: UISettings, messages: Message[] }) => {
-    const isDark = settings.darkTheme;
-    const isSMS = settings.chatType === 'SMS';
-    const userBubbleColor = isSMS ? 'bg-green-500 text-white' : 'bg-blue-500 text-white';
-    
-    // Base classes for the phone "screen"
-    const screenBase = cn(
-        "w-full h-full overflow-hidden flex flex-col font-sans",
-        isDark ? "bg-black text-white" : "bg-white text-black"
-    );
+const PhonePreview = ({ settings, messages }: { settings: UISettings; messages: Message[] }) => {
+  const isDark = settings.darkTheme
+  const isSMS = settings.chatType === 'SMS'
+  const userBubbleColor = isSMS ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
 
-    return (
-        <div className="relative" style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}}>
-             {/* Device Frame */}
-             <div className={cn(
-                 "relative w-[320px] h-[650px] sm:w-[375px] sm:h-[812px] bg-black rounded-[50px] shadow-2xl border-[8px] border-zinc-800 overflow-hidden",
-                 "ring-1 ring-white/10" 
-             )}>
-                 
-                 {/* --- FIXED: Dynamic Island --- */}
-                 {/* Positioned absolutely, centered horizontally */}
-                 <div className="absolute top-[11px] left-1/2 -translate-x-1/2 h-[30px] w-[120px] bg-black z-30 rounded-[20px]"></div>
+  // Base classes for the phone "screen"
+  const screenBase = cn(
+    'w-full h-full overflow-hidden flex flex-col font-sans',
+    isDark ? 'bg-black text-white' : 'bg-white text-black',
+  )
 
-                 {/* --- FIXED: iOS Status Bar --- */}
-                 <div className={cn(
-                    "absolute top-0 w-full h-[54px] px-8 flex justify-between items-center text-[14px] font-semibold z-40 select-none",
-                    isDark ? "text-white" : "text-black"
-                 )}>
-                    {/* Time (Left) */}
-                    <span className='ml-5 items-center'>9:41</span>
+  return (
+    <div
+      className="relative"
+      style={{
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+      }}
+    >
+      {/* Device Frame */}
+      <div
+        className={cn(
+          'relative w-[320px] h-[650px] sm:w-[375px] sm:h-[812px] bg-black rounded-[50px] shadow-2xl border-[8px] border-zinc-800 overflow-hidden',
+          'ring-1 ring-white/10',
+        )}
+      >
+        {/* --- FIXED: Dynamic Island --- */}
+        {/* Positioned absolutely, centered horizontally */}
+        <div className="absolute top-[11px] left-1/2 -translate-x-1/2 h-[30px] w-[120px] bg-slate-500 z-30 rounded-[20px]"></div>
 
-                    {/* Icons (Right) */}
-                    <div className="flex justify-between gap-1 items-center">
-                        {/* Use generic shapes if you don't have the specific Phosphor/Lucide icons loaded */}
-                        {/* <CellSignalHighIcon size={23} className="" />  */}
-                        <Signal size={23} className='w-5 h-4' />
-                        <Wifi size={23} className='w-4 h-5'/>
-                        <BatteryChargingIcon size={23} weight="fill" className='w-5 h-5 ml-1' /> 
-                    </div>
-                 </div>
-                 
-                 {/* Screen Content */}
-                 {/* Added pt-[54px] so content starts BELOW the status bar area */}
-                 <div className={cn(screenBase, "pt-[54px]")}>
+        {/* --- FIXED: iOS Status Bar --- */}
+        <div
+          className={cn(
+            'absolute top-0 w-full h-[54px] px-8 flex justify-between items-center text-[14px] font-semibold z-40 select-none',
+            isDark ? 'text-white' : 'text-black',
+          )}
+        >
+          {/* Time (Left) */}
+          <span className="ml-5 items-center">9:41</span>
 
-                     {/* Navigation Bar */}
-                     <div className={cn(
-                         "flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0",
-                         isDark ? "border-zinc-800" : "border-zinc-200/50"
-                     )}>
-                         <div className="flex flex-col items-center gap-1.5" style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}}>
-                            {/* Larger Avatar */}
-                            <div className={cn(
-                                "w-12 h-12 rounded-full flex items-center justify-center text-xl font-medium text-white shadow-sm",
-                                // Gradient style
-                                "bg-gradient-to-b from-gray-400 to-gray-500" 
-                            )}>
-                                {settings.recipientName.charAt(0).toUpperCase()}
-                            </div>
-                            
-                            {/* Name + Chevron */}
-                            <div style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
-                              "flex items-center px-2 py-1 gap-1 cursor-pointer opacity-90 hover:opacity-100 transition-opacity rounded-2xl",
-                              isDark? "shadow-md shadow-slate-100/10" : "shadow-md shadow-slate-100"
-                            )}>
-                                <span className="text-[14px] font-semibold tracking-tight">
-                                    {settings.recipientName}
-                                </span>
-                                <ChevronRight className={cn(
-                                    "w-3 h-3 opacity-50",
-                                    isDark ? "text-gray-400" : "text-gray-500"
-                                )} />
-                            </div>
-                         </div>
-                     </div>
-
-                     {/* Chat Area */}
-                     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 no-scrollbar">
-                         <div className="text-center leading-none" style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}}>
-                             <span className="text-[10px] text-gray-500 font-medium">
-                                 {isSMS ? 'Text Message' : 'iMessage'}
-                             </span>
-                             <div className="text-[10px] text-gray-400 mt-1">
-                                 Today 10:25 AM
-                             </div>
-                         </div>
-
-                         {messages.map((msg, i) => (
-                             <div key={msg.id || i} className={cn(
-                                 "flex flex-col max-w-[75%] pt-3",
-                                 msg.isUserMessage ? "ml-auto items-end" : "mr-auto items-start"
-                             )}>
-                                 <div style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
-                                     "px-4 py-2 rounded-2xl text-[15px] leading-snug break-words",
-                                     msg.isUserMessage 
-                                        ? `${userBubbleColor} rounded-br-sm` 
-                                        : (isDark ? "bg-zinc-800 text-white rounded-bl-sm" : "bg-gray-200 text-black rounded-bl-sm")
-                                 )}>
-                                     {msg.text || "..."}
-                                 </div>                                 
-
-                                 {msg.timestamp && (
-                                     <span style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
-                                         "text-[10px] mt-1 font-medium px-1",
-                                         msg.isUserMessage ? "text-right" : "text-left",
-                                         isDark ? "text-gray-500" : "text-gray-400"
-                                     )}>
-                                        {msg.isUserMessage && msg.status === 'read' ? 'Read ' : ''}
-                                        {msg.isUserMessage && msg.status === 'delivered' ? 'Delivered ' : ''}
-                                        {msg.timestamp}
-                                     </span>
-                                 )}
-                             </div>
-                         ))}
-                     </div>
-
-                     {/* Bottom Input Area */}
-                     <div className={cn(
-                         "min-h-[50px] px-4 py-2 flex items-center gap-3 z-10 pb-6", // Added extra bottom padding for Home Bar safety
-                         isDark ? "bg-black" : "bg-white"
-                     )}>
-                         <div className={cn(
-                          "w-8 h-8 rounded-full flex-shrink-0 items-center flex justify-center text-gray-400", 
-                          isDark ? "bg-zinc-800 shadow-md shadow-slate-100/10" : "bg-gray-200 shadow-md shadow-slate-100")}>
-                                <Plus className="w-5 h-5" />
-                         </div>
-                         
-                         <div style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'}} className={cn(
-                             "flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground shadow-md shadow-slate-100",
-                             isDark ? "border-zinc-800 bg-zinc-900 shadow-md shadow-slate-100/10" : "border-zinc-200 bg-white",
-                         )}>
-                             iMessage
-                         </div>
-                     </div>
-                     
-                     {/* Home Bar (Overlay) */}
-                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[5px] bg-white/50 rounded-full z-50 pointer-events-none"></div>
-                 </div>
-             </div>
+          {/* Icons (Right) */}
+          <div className="flex justify-between gap-1 items-center">
+            {/* Use generic shapes if you don't have the specific Phosphor/Lucide icons loaded */}
+            {/* <CellSignalHighIcon size={23} className="" />  */}
+            <Signal size={23} className="w-5 h-4" />
+            <Wifi size={23} className="w-4 h-5" />
+            <BatteryChargingIcon size={23} weight="fill" className="w-5 h-5 ml-1" />
+          </div>
         </div>
-    )
+
+        {/* Screen Content */}
+        {/* Added pt-[54px] so content starts BELOW the status bar area */}
+        <div className={cn(screenBase, 'pt-[54px]')}>
+          {/* Navigation Bar */}
+          <div
+            className={cn(
+              'flex flex-col items-center justify-center z-10 backdrop-blur-xl bg-opacity-80 transition-colors flex-shrink-0',
+              isDark ? 'border-zinc-800' : 'border-zinc-200/50',
+            )}
+          >
+            <div
+              className="flex flex-col items-center gap-1.5"
+              style={{
+                fontFamily:
+                  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+              }}
+            >
+              {/* Larger Avatar */}
+              <div
+                className={cn(
+                  'w-12 h-12 rounded-full flex items-center justify-center text-xl font-medium text-white shadow-sm',
+                  // Gradient style
+                  'bg-gradient-to-b from-gray-400 to-gray-500',
+                )}
+              >
+                {settings.recipientName.charAt(0).toUpperCase()}
+              </div>
+
+              {/* Name + Chevron */}
+              <div
+                style={{
+                  fontFamily:
+                    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                }}
+                className={cn(
+                  'flex items-center px-2 py-1 gap-1 cursor-pointer opacity-90 hover:opacity-100 transition-opacity rounded-2xl',
+                  isDark ? 'shadow-md shadow-slate-100/10' : 'shadow-md shadow-slate-100',
+                )}
+              >
+                <span className="text-[14px] font-semibold tracking-tight">
+                  {settings.recipientName}
+                </span>
+                <ChevronRight
+                  className={cn('w-3 h-3 opacity-50', isDark ? 'text-gray-400' : 'text-gray-500')}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Chat Area */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 no-scrollbar">
+            <div
+              className="text-center leading-none"
+              style={{
+                fontFamily:
+                  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+              }}
+            >
+              <span className="text-[10px] text-gray-500 font-medium">
+                {isSMS ? 'Text Message' : 'iMessage'}
+              </span>
+              <div className="text-[10px] text-gray-400 mt-1">Today 10:25 AM</div>
+            </div>
+
+            {messages.map((msg, i) => (
+              <div
+                key={msg.id || i}
+                className={cn(
+                  'flex flex-col max-w-[75%] pt-3',
+                  msg.isUserMessage ? 'ml-auto items-end' : 'mr-auto items-start',
+                )}
+              >
+                <div
+                  style={{
+                    fontFamily:
+                      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                  }}
+                  className={cn(
+                    'px-4 py-2 rounded-2xl text-[15px] leading-snug break-words',
+                    msg.isUserMessage
+                      ? `${userBubbleColor} rounded-br-sm`
+                      : isDark
+                        ? 'bg-zinc-800 text-white rounded-bl-sm'
+                        : 'bg-gray-200 text-black rounded-bl-sm',
+                  )}
+                >
+                  {msg.text || '...'}
+                </div>
+
+                {msg.timestamp && (
+                  <span
+                    style={{
+                      fontFamily:
+                        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    }}
+                    className={cn(
+                      'text-[10px] mt-1 font-medium px-1',
+                      msg.isUserMessage ? 'text-right' : 'text-left',
+                      isDark ? 'text-gray-500' : 'text-gray-400',
+                    )}
+                  >
+                    {msg.isUserMessage && msg.status === 'read' ? 'Read ' : ''}
+                    {msg.isUserMessage && msg.status === 'delivered' ? 'Delivered ' : ''}
+                    {msg.timestamp}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom Input Area */}
+          <div
+            className={cn(
+              'min-h-[50px] px-4 py-2 flex items-center gap-3 z-10 pb-6', // Added extra bottom padding for Home Bar safety
+              isDark ? 'bg-black' : 'bg-white',
+            )}
+          >
+            <div
+              className={cn(
+                'w-8 h-8 rounded-full flex-shrink-0 items-center flex justify-center text-gray-400',
+                isDark
+                  ? 'bg-zinc-800 shadow-md shadow-slate-100/10'
+                  : 'bg-gray-200 shadow-md shadow-slate-100',
+              )}
+            >
+              <Plus className="w-5 h-5" />
+            </div>
+
+            <div
+              style={{
+                fontFamily:
+                  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+              }}
+              className={cn(
+                'flex-1 h-9 rounded-full border px-3 flex items-center text-sm text-muted-foreground shadow-md shadow-slate-100',
+                isDark
+                  ? 'border-zinc-800 bg-zinc-900 shadow-md shadow-slate-100/10'
+                  : 'border-zinc-200 bg-white',
+              )}
+            >
+              iMessage
+            </div>
+          </div>
+
+          {/* Home Bar (Overlay) */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[5px] bg-white/50 rounded-full z-50 pointer-events-none"></div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default CreateScenarioClient
